@@ -1,11 +1,10 @@
 package cn.joy.demo.external.html.novel;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpUtils;
 
 import cn.joy.framework.kits.FileKit;
 import cn.joy.framework.kits.HttpKit;
@@ -34,7 +33,7 @@ public class GetNovel {
 		
 	}
 	
-	public static void main2() {
+	public static void main2() throws Exception{
 		Map<Integer, String[]> chapters = new HashMap();
 		
 		getChapters(chapters, "http://tieba.baidu.com/p/1314402744");
@@ -75,14 +74,14 @@ public class GetNovel {
 		}
 	}
 	
-	public static void writeChapterContents(Map<Integer, String[]> chapters){
+	public static void writeChapterContents(Map<Integer, String[]> chapters) throws IOException{
 		int maxNum = Integer.parseInt(chapters.get(-1)[0]);
 		for(int i=1;i<=maxNum;i++){
 			StringBuilder sb = new StringBuilder();
 			String[] chapterInfo = chapters.get(i);
 			if(chapterInfo==null){
 				System.out.println("缺少第"+i+"章");
-				sb.append(FileKit.readInfoFromFile(baseDir+"lost/"+i+".txt")); 
+				sb.append(FileKit.readFile(baseDir+"lost/"+i+".txt")); 
 			}else{
 				String chapterName = chapterInfo[0];
 				String chapterUrl = chapterInfo[1];
@@ -90,7 +89,7 @@ public class GetNovel {
 				String content = getChapterContent(chapterUrl);
 				if("NONE".equals(content)){
 					System.out.println("无效的url，缺少第"+i+"章");
-					sb.append(FileKit.readInfoFromFile(baseDir+"lost/"+i+".txt")); 
+					sb.append(FileKit.readFile(baseDir+"lost/"+i+".txt")); 
 				}else
 					sb.append(content).append("\r\n\r\n");
 			}
@@ -98,14 +97,14 @@ public class GetNovel {
 		}
 	}
 	
-	public static StringBuilder getChapterContents(Map<Integer, String[]> chapters){
+	public static StringBuilder getChapterContents(Map<Integer, String[]> chapters) throws IOException{
 		StringBuilder sb = new StringBuilder();
 		int maxNum = Integer.parseInt(chapters.get(-1)[0]);
 		for(int i=1;i<=maxNum;i++){
 			String[] chapterInfo = chapters.get(i);
 			if(chapterInfo==null){
 				System.out.println("缺少第"+i+"章");
-				sb.append(FileKit.readInfoFromFile(baseDir+"lost/"+i+".txt")); 
+				sb.append(FileKit.readFile(baseDir+"lost/"+i+".txt")); 
 			}else{
 				String chapterName = chapterInfo[0];
 				String chapterUrl = chapterInfo[1];
@@ -113,7 +112,7 @@ public class GetNovel {
 				String content = getChapterContent(chapterUrl);
 				if("NONE".equals(content)){
 					System.out.println("无效的url，缺少第"+i+"章");
-					sb.append(FileKit.readInfoFromFile(baseDir+"lost/"+i+".txt")); 
+					sb.append(FileKit.readFile(baseDir+"lost/"+i+".txt")); 
 				}else
 					sb.append(content).append("\r\n\r\n");
 			}
