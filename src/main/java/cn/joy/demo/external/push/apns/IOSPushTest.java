@@ -5,20 +5,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javapns.Push;
 import javapns.devices.Device;
 import javapns.devices.implementations.basic.BasicDevice;
 import javapns.notification.AppleNotificationServerBasicImpl;
 import javapns.notification.PushNotificationManager;
 import javapns.notification.PushNotificationPayload;
 import javapns.notification.PushedNotification;
+import javapns.notification.PushedNotifications;
 import cn.joy.framework.kits.JsonKit;
 
 public class IOSPushTest {
 	private static int badge = 1;
-	private final static String PASSWORD = "actiz1512";
+	private final static String PASSWORD = "";
 	private final static String CERTIFICATE_PATH = IOSPushTest.class
 			.getResource("/").getPath()
-			+ "/com/joy/demo/push/apns/push_cer_product.p12";
+			+ "/cn/joy/demo/external/push/apns/push_cer_product.p12";
 	/**
 	 * 
 	 * 
@@ -134,15 +136,24 @@ public class IOSPushTest {
 
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception{
 		Map msgInfo = new HashMap();
-		msgInfo.put("alert", "3");
+		msgInfo.put("alert", "312");
 		
 		Map apns = new HashMap();
-		apns.put("aps", msgInfo);
+		//apns.put("aps", msgInfo);
+		
+		Map m = new HashMap();
+		m.put("type", "1");
+		m.put("alert", msgInfo.get("alert"));
+		apns.put("aps", m);
+			
 		String message = JsonKit.object2Json(apns);
+		message = "{\"aps\":{\"type\":\"1\",\"alert\":\"CU42 发来消息\"}}";
 		List<String> tokens = new ArrayList();
 		tokens.add("e8fd8ad066d154e3605f45b090845dce6a7283dbe412554016295b9f054f2ca5");
-		sendpush(tokens, CERTIFICATE_PATH, PASSWORD, message, badge, true);
+		sendpush(tokens, CERTIFICATE_PATH, PASSWORD, message, badge, false);
+		//PushedNotifications pns = Push.combined(message, badge, "default", CERTIFICATE_PATH, PASSWORD, true, "e8fd8ad066d154e3605f45b090845dce6a7283dbe412554016295b9f054f2ca5");
+		
 	}
 }
