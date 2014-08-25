@@ -12,3 +12,4 @@ public class SecurityKit {
 		System.out.println(ESAPI.encoder().encodeForHTML(html));
 	}
 }
+
