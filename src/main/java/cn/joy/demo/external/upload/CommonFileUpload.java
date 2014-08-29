@@ -12,10 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang.StringUtils;
 
 @WebServlet("/upload/cf")
 public class CommonFileUpload extends HttpServlet {
@@ -26,8 +26,12 @@ public class CommonFileUpload extends HttpServlet {
 		if (isMultipart) {
 			System.out.println(request.getParameter("datas"));	//不能直接获取
 			
-			FileItemFactory factory = new DiskFileItemFactory();
+			DiskFileItemFactory factory = new DiskFileItemFactory();
+			factory.setSizeThreshold(8 * 1024);
+			
 			ServletFileUpload upload = new ServletFileUpload(factory);
+			upload.setSizeMax(10 * 1024 * 1024);
+			
 			List<FileItem> items = null;
 			try {
 				items = upload.parseRequest(request);
@@ -42,10 +46,9 @@ public class CommonFileUpload extends HttpServlet {
 					String fieldName = item.getFieldName();
 					if (fieldName.equals("datas")) 
 						System.out.println("the datas is" + item.getString());// 显示表单内容。
-				} else if(item.getName()!=null){// 如果是上传文件，显示文件名。
+				} else if(StringUtils.isNotBlank(item.getName())){// 如果是上传文件，显示文件名。
 					System.out.println("the upload file name is " + item.getName());
-					File fullFile = new File(item.getName());
-					File savedFile = new File("D:/upload", fullFile.getName());
+					File savedFile = new File("D:/upload", item.getName());
 					try {
 						item.write(savedFile);
 					} catch (Exception e) {
