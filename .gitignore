@@ -15,4 +15,4 @@ hs_err_pid*
 /target
 /test-result
 /bin
-Test.java
+/src/main/java/test
