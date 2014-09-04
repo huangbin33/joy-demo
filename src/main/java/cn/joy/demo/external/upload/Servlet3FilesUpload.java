@@ -3,7 +3,9 @@ package cn.joy.demo.external.upload;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -15,7 +17,9 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.lang.StringUtils;
 
-@MultipartConfig(location = "D:/upload", maxFileSize = 1024 * 1024 * 10, maxRequestSize = 1024L * 1024L * 10L)
+import cn.joy.framework.kits.JsonKit;
+
+@MultipartConfig(location = "/home/actiz/tomcat7/upload_files", maxFileSize = 1024 * 1024 * 10, maxRequestSize = 1024L * 1024L * 10L)
 @WebServlet("/upload/ss3")
 public class Servlet3FilesUpload extends HttpServlet{
 	private static final MultipartConfig config;
@@ -32,6 +36,7 @@ public class Servlet3FilesUpload extends HttpServlet{
 			IOException {
 		// 为避免获取文件名称时出现乱码
 		request.setCharacterEncoding("UTF-8");
+		response.setHeader("Access-Control-Allow-Origin", "*");
 		
 		System.out.println(request.getParameter("datas"));	//能直接获取
 
@@ -83,8 +88,18 @@ public class Servlet3FilesUpload extends HttpServlet{
 			fileNames.add(fileName);
 		}
 
-		request.setAttribute("fileNames", fileNames);
-		request.getRequestDispatcher("/uploadsResult.jsp").forward(request, response);
+		if("json".equals(request.getParameter("dataType"))){
+			response.getWriter().write("{\"result\":\""+fileNames+"\"}");
+		}else{
+			request.setAttribute("fileNames", fileNames);
+			request.getRequestDispatcher("/uploadsResult.jsp").forward(request, response);
+		}
+	}
+	
+	@Override
+	protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setHeader("Allow" , "POST");    
+		response.setHeader("Access-Control-Allow-Origin", "*");
 	}
 
 	private void doError(HttpServletRequest request, HttpServletResponse response, String errMsg)
