@@ -130,6 +130,34 @@
     function bootstrap() {
 
     }
+    
+    function jqueryPlugin(pluginKey, pluginConstructor){
+    	return function(options){
+    		if (isString(options)) {
+    			var args = Array.prototype.slice.call(arguments, 1);
+    			var res;
+    			this.each(function() {
+    				var plugin = $.data(this, pluginKey);
+    				if (plugin && $.isFunction(plugin[options])) {
+    					var r = plugin[options].apply(plugin, args);
+    					if (res === undefined) 
+    						res = r;
+    				}
+    			});
+    			return res!==undefined?res:this;
+    		}
+    		
+    		this.each(function() {
+    			var plugin = $.data(this, pluginKey);
+    			if(!plugin)
+    				plugin = $.data(this, pluginKey, new pluginConstructor(this, options));
+    			else if(isFunction(plugin.update))
+    				plugin.update(options);
+    		});
+    		
+    		return this;
+    	}
+    }
 
     //publish external API
     joy.noop = noop;
@@ -143,7 +171,8 @@
         'noop':noop,
         'isString': isString,
         'isFunction': isFunction,
-        'isArray': isArray
+        'isArray': isArray,
+        'jqp': jqueryPlugin
     });
 
 })(window, document);
