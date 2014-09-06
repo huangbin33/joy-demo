@@ -26,11 +26,16 @@ $(function(){
     $("#jqp-wrap").joyuploader({
         pickLabel: "点击添加",
         pickTips: "或将文件拖到这里",
-        uploadLabel: "开始上传",
-        pickOtherLabel: "继续添加",
+        //uploadLabel: "开始上传",
+        //pickOtherLabel: "继续添加",
+        multiple: false,
+        auto: true,
         baseOpts:{
-            fileNumLimit: 5,
+            fileNumLimit: 10,
             server: '${uploadURL4Json}'
+        },
+        onFileUpload: function(file, response){
+        	console.log(response);
         },
         BASE_URL: "${pageContext.request.contextPath}"
     });

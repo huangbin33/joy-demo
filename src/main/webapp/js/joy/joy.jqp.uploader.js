@@ -64,7 +64,8 @@
 		        fileSize = 0,
 		        // 删除的已上传文件数量
 		        fileCancelCount = 0,
-		        multiple = opts.multiple!==false,
+		        multipleSupport = opts.multiple!==false,
+		        autoUploadSupport = opts.auto===true,
 		        // 优化retina, 在retina下这个值是2
         		ratio = window.devicePixelRatio || 1,
 		        // 缩略图大小
@@ -99,7 +100,7 @@
 		        var uploaderOpts = $.extend(true, {
 			        pick: {
 			            id: '.pick',
-			            multiple: multiple
+			            multiple: multipleSupport
 			        },
 			        dnd: '.joy-uploader-wrap .queueList',
 			        paste: window.document.body,
@@ -119,19 +120,23 @@
 			        swf: opts.BASE_URL + '/js/webuploader/Uploader.swf',
 			        disableGlobalDnd: true,
 			        chunked: true,
-			        fileNumLimit: multiple?10:1,
+			        auto: autoUploadSupport,
+			        fileNumLimit: multipleSupport?10:1,
 			        fileSizeLimit: 10 * 1024 * 1024,   
 			        fileSingleSizeLimit: 10 * 1024 * 1024   
 			    }, opts.baseOpts||{});
 			    uploader = WebUploader.create(uploaderOpts);
 
 			    // 添加其他“添加文件”的按钮，
-			    if(multiple){
+			    if(multipleSupport){
 			    	uploader.addButton({
 				        id: '.pick-other',
 				        label: opts.pickOtherLabel||"继续添加"
 				    });
 			    }
+
+			    if(autoUploadSupport)
+			    	$upload.hide();
 
 			    // 当有文件添加进来时执行，负责view的创建
 			    function addFile( file ) {
@@ -224,8 +229,10 @@
 			            var index = $(this).index(), deg;
 			            switch ( index ) {
 			                case 0:
-			                	if(file.getStatus()=="complete")
+			                	if(file.getStatus()=="complete"){
 			                		fileCancelCount++;
+			                		opts.onFileRemove(file);
+			                	}
 			                    uploader.removeFile( file );
 			                    return;
 			                case 1:
@@ -367,7 +374,7 @@
 			    };
 
 			    uploader.onUploadSuccess = function( file, response ) {
-			       console.log(response);
+			       opts.onFileUpload(file, response);
 			    };
 
 			    uploader.onFileQueued = function( file ) {
@@ -482,5 +489,13 @@
 
 $.joyuploader.defaults = {    
 	thumbWidth: 110,
-	thumbHeight: 110
+	thumbHeight: 110,
+	// 文件上传成功后的处理
+	onFileUpload: function(file, response){
+
+	},
+	// 删除上传成功文件时的处理
+	onFileRemove: function(file){
+
+	}
 }; 
