@@ -1,3 +1,6 @@
+.joy-uploader-wrap{
+	text-align: center;
+}
 .joy-uploader-wrap .queueList {
     margin: 20px;
     border: 2px dashed #e6e6e6;
@@ -25,7 +28,9 @@
     font-size: 18px;
     position: relative;
 }
-
+.joy-uploader-wrap .pick{
+	text-align: center;
+}
 .joy-uploader-wrap .placeholder .webuploader-pick {
     font-size: 18px;
     background: #00b7ee;

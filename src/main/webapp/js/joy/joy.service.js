@@ -1,7 +1,7 @@
 /**
  * Created by liyy on 2014/8/26.
  */
-joy.service("validate", function() {
+joy.validator = joy.service("validate", function() {
 	var regExs = {
 		"ASCII" : /^[\x00-\xFF]+$/, // ASCII
 		"CHINESE" : /^\u4E00-\u9FA5\uF900-\uFA2D$/, // 中文

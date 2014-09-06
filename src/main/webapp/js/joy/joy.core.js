@@ -2,7 +2,8 @@
  * Created by liyy on 2014/8/26.
  */
 (function (window, document, undefined) {
-    var msie, _joy = window.joy,
+    var msie, 
+    	_joy = window.joy,
         joy = window.joy || (window.joy = {}),
         joyModule;
 
@@ -33,9 +34,8 @@
     }
 
     function isArray(value) {
-        return toString.call(value) === '[object Array]';
+        return Object.prototype.toString.call(value) === '[object Array]';
     }
-    //Object.prototype.toString
 
     function isWindow(obj) {
         return obj && obj.document && obj.location && obj.alert && obj.setInterval;
@@ -61,8 +61,6 @@
         if (obj) {
             if (isFunction(obj)) {
                 for (key in obj) {
-                    // Need to check if hasOwnProperty exists,
-                    // as on IE8 the result of querySelectorAll is an object without a hasOwnProperty function
                     if (key != 'prototype' && key != 'length' && key != 'name' && (!obj.hasOwnProperty || obj.hasOwnProperty(key))) {
                         iterator.call(context, obj[key], key);
                     }

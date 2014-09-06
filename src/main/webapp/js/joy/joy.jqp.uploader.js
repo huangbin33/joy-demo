@@ -1,7 +1,7 @@
 /**
  * Created by liyy on 2014/9/04.
  * 
- * depend on jquery and webuploader
+ * joy jquery plugin base on webuploader
  */
 (function(window, joy, $, undefined) {
 	var pluginKey = "joy-uploader";
@@ -14,7 +14,7 @@
 	$.joyuploader.prototype = {
 		_create: function(options){
 			if ( !WebUploader.Uploader.support() ) {
-		        alert( '上传组件不支持您的浏览器！如果你使用的是IE浏览器，请尝试升级 flash 播放器');
+		        alert( '上传组件不支持您的浏览器！如果您使用的是IE浏览器，请尝试升级 flash播放器');
 		        throw new Error( 'WebUploader does not support the browser you are using.' );
 		    }
 
@@ -24,7 +24,7 @@
             var html = "<div class='queueList'>\
 					        <div class='placeholder'>\
 					            <div class='pick'>"+(opts.pickLabel||"点击添加")+"</div>\
-					            <p>"+(opts.pickTips||"或将文件拖到这里")+"</p>\
+					            <p>"+(opts.pickTips||"")+"</p>\
 					        </div>\
 					        <ul class='filelist'></ul>\
 					    </div>\
