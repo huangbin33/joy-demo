@@ -62,6 +62,8 @@
 		        fileCount = 0,
 		        // 添加的文件总大小
 		        fileSize = 0,
+		        // 删除的已上传文件数量
+		        fileCancelCount = 0,
 		        multiple = opts.multiple!==false,
 		        // 优化retina, 在retina下这个值是2
         		ratio = window.devicePixelRatio || 1,
@@ -117,7 +119,7 @@
 			        swf: opts.BASE_URL + '/js/webuploader/Uploader.swf',
 			        disableGlobalDnd: true,
 			        chunked: true,
-			        fileNumLimit: 10,
+			        fileNumLimit: multiple?10:1,
 			        fileSizeLimit: 10 * 1024 * 1024,   
 			        fileSingleSizeLimit: 10 * 1024 * 1024   
 			    }, opts.baseOpts||{});
@@ -222,6 +224,8 @@
 			            var index = $(this).index(), deg;
 			            switch ( index ) {
 			                case 0:
+			                	if(file.getStatus()=="complete")
+			                		fileCancelCount++;
 			                    uploader.removeFile( file );
 			                    return;
 			                case 1:
@@ -275,28 +279,14 @@
 			    }
 
 			    function updateStatus() {
-			        var text = '', stats;
+		            var stats = uploader.getStats();
+		            var text = '共' + fileCount + '个（' +
+		                    WebUploader.formatSize( fileSize )  +
+		                    '），已上传' + (stats.successNum-fileCancelCount) + '个';
 
-			        if ( state === 'ready' ) {
-			            text = '选中' + fileCount + '个文件，共' +
-			                    WebUploader.formatSize( fileSize ) + '。';
-			        } else if ( state === 'confirm' ) {
-			            stats = uploader.getStats();
-			            if ( stats.uploadFailNum ) {
-			                text = '已成功上传' + stats.successNum+ '个文件，'+
-			                    stats.uploadFailNum + '个文件上传失败，<a class="retry" href="#">重新上传</a>失败文件或<a class="ignore" href="#">忽略</a>'
-			            }
-
-			        } else {
-			            stats = uploader.getStats();
-			            text = '共' + fileCount + '个（' +
-			                    WebUploader.formatSize( fileSize )  +
-			                    '），已上传' + stats.successNum + '个';
-
-			            if ( stats.uploadFailNum ) {
-			                text += '，失败' + stats.uploadFailNum + '个';
-			            }
-			        }
+		            if ( stats.uploadFailNum ) {
+		                text += '，失败' + stats.uploadFailNum + '个(<a class="retry" href="#">重新上传</a>)';
+		            }
 
 			        $info.html( text );
 			    }
@@ -376,6 +366,10 @@
 			        updateTotalProgress();
 			    };
 
+			    uploader.onUploadSuccess = function( file, response ) {
+			       console.log(response);
+			    };
+
 			    uploader.onFileQueued = function( file ) {
 			        fileCount++;
 			        fileSize += file.size;
@@ -417,6 +411,8 @@
 			            case 'stopUpload':
 			                setState( 'paused' );
 			                break;
+
+
 
 			        }
 			    });

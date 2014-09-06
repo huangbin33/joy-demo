@@ -16,3 +16,5 @@ hs_err_pid*
 /test-result
 /bin
 /src/main/java/test
+/src/main/webapp/WEB-INF/lib
+/src/main/webapp/WEB-INF/classes

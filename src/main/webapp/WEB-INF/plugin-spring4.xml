@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="     
+          http://www.springframework.org/schema/beans     
+          http://www.springframework.org/schema/beans/spring-beans-4.0.xsd     
+          http://www.springframework.org/schema/context     
+          http://www.springframework.org/schema/context/spring-context-4.0.xsd     
+          http://www.springframework.org/schema/mvc
+		  http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+	<bean id="joyAbstractServiceDefinition"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+		lazy-init="true" abstract="true">
+		<property name="proxyTargetClass">
+			<value>true</value>
+		</property>
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">
+					PROPAGATION_REQUIRED,ISOLATION_DEFAULT,-Exception
+				</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="joySpringDb" class="cn.joy.framework.plugin.spring.db.SpringDb">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<bean id="joyRuleDao" class="cn.joy.framework.plugin.spring.db.RuleDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<bean id="joyRuleDaoProxy" parent="joyAbstractServiceDefinition">
+		<property name="target" ref="joyRuleDao" />
+	</bean>
+
+	<bean id="springResource" class="cn.joy.framework.plugin.spring.SpringResource">
+		<property name="MVC_OPEN_REQUEST_URL"><value>openservice.do</value></property>
+		<property name="MVC_BUSINESS_REQUEST_URL"><value>businesservice.do</value></property>
+		<property name="ruleDao" ref="joyRuleDaoProxy" />
+		<property name="mainDb" ref="joySpringDb" />
+		<property name="securityManager" ref="securityManager" />
+		<property name="routeStore" ref="routeStore" />
+	</bean>
+
+	<bean name="/openservice.do" class="cn.joy.framework.plugin.spring.web.OpenRuleController">
+		<property name="methodNameResolver" ref="methodNameResolver" />
+	</bean>
+
+	<bean name="/businessservice.do" class="cn.joy.framework.plugin.spring.web.BusinessRuleController">
+		<property name="methodNameResolver" ref="methodNameResolver" />
+	</bean>
+	
+	<bean name="/webproxy.do" class="cn.joy.framework.plugin.spring.web.WebProxyController">
+		<property name="methodNameResolver" ref="methodNameResolver" />
+	</bean>
+	
+	<!-- 用户需要自定义安全管理器，检查请求的安全性 -->
+	<bean id="securityManager" class="cn.joy.framework.plugin.spring.support.DefaultSecurityManager">
+	</bean>
+	
+	<!-- 用户需要自定义服务器路由存储 -->
+	<bean id="routeStore" class="cn.joy.framework.plugin.spring.support.DefaultRouteStore">
+	</bean>
+	
+	<bean id="joyManager" class="cn.joy.framework.core.JoyManager" init-method="init" 
+		depends-on="routeStore">
+	</bean>
+</beans>
