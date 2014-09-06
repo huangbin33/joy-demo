@@ -5,8 +5,8 @@
 <script type="text/javascript" src="${ctx}/js/joy/joy.core.js"></script>
 <script type="text/javascript" src="${ctx}/js/joy/joy.service.js"></script>
 <!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+<script src="${ctx}/js/webuploader/vendor/html5shiv.js"></script>
+<script src="${ctx}/js/webuploader/vendor/respond.min.js"></script>
 <![endif]-->
 <script type="text/javascript" src="${ctx}/js/webuploader/webuploader.js"></script>
 <script type="text/javascript" src="${ctx}/js/joy/joy.jqp.uploader.js"></script>
@@ -28,14 +28,17 @@ $(function(){
         pickTips: "或将文件拖到这里",
         //uploadLabel: "开始上传",
         //pickOtherLabel: "继续添加",
-        multiple: false,
-        auto: true,
+        //multiple: false,
+        //auto: true,
+        thumbWidth: 250,
+		thumbHeight: 250,
+		showStatusBar: false,
         baseOpts:{
             fileNumLimit: 10,
             server: '${uploadURL4Json}'
         },
         onFileUpload: function(file, response){
-        	console.log(response);
+        	console.log(response.result);
         },
         BASE_URL: "${pageContext.request.contextPath}"
     });

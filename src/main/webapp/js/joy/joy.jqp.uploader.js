@@ -8,6 +8,11 @@
 
 	$.joyuploader = function(element, options){
 		this.$wrap = this.$el = $(element);
+		/*this.wrapId = $wrap.attr("id");
+		if(!this.wrapId){
+			this.wrapId = pluginKey+"_"+(+new Date())+Math.floor( Math.random() * 65535 );
+			
+		}*/
 		this._create( options );
 	}
 
@@ -43,10 +48,12 @@
 		},
 
 		_init: function(){
-			var $wrap = this.$wrap,
+			var instance = this,
+				$wrap = this.$wrap,
 				opts = this.options,
 				wrapWidth = $wrap.width(),
 				wrapHeight = $wrap.height();
+			
 			// 图片容器
         	var $queue = $wrap.find('.filelist'),
 	        	$statusBar = $wrap.find('.statusBar'),
@@ -57,7 +64,7 @@
 		        // 没选择文件之前的内容。
 		        $placeHolder = $wrap.find('.placeholder'),
 		        // 总体进度条
-		        $progress = $statusBar.find('.progress').hide(),
+		        $progress = $statusBar.find('.progress').css("visibility", "hidden"),//.hide(),
 		        // 添加的文件数量
 		        fileCount = 0,
 		        // 添加的文件总大小
@@ -66,6 +73,7 @@
 		        fileCancelCount = 0,
 		        multipleSupport = opts.multiple!==false,
 		        autoUploadSupport = opts.auto===true,
+		        showStatusBar = opts.showStatusBar!==false,
 		        // 优化retina, 在retina下这个值是2
         		ratio = window.devicePixelRatio || 1,
 		        // 缩略图大小
@@ -90,7 +98,7 @@
 
 		        //位置、大小调整
 				$placeHolder.css({
-					paddingTop: wrapHeight/2-20
+					paddingTop: wrapHeight/2-25
 				});
 				$queue.parent().css({
 					minHeight: wrapHeight
@@ -99,10 +107,10 @@
 		        // 实例化
 		        var uploaderOpts = $.extend(true, {
 			        pick: {
-			            id: '.pick',
+			            id: $wrap.find('.pick')[0],
 			            multiple: multipleSupport
 			        },
-			        dnd: '.joy-uploader-wrap .queueList',
+			        dnd: $wrap.find('.queueList')[0],
 			        paste: window.document.body,
 			        //runtimeOrder : 'flash',
 			        accept: [{
@@ -130,7 +138,7 @@
 			    // 添加其他“添加文件”的按钮，
 			    if(multipleSupport){
 			    	uploader.addButton({
-				        id: '.pick-other',
+				        id: $wrap.find('.pick-other')[0],
 				        label: opts.pickOtherLabel||"继续添加"
 				    });
 			    }
@@ -231,7 +239,7 @@
 			                case 0:
 			                	if(file.getStatus()=="complete"){
 			                		fileCancelCount++;
-			                		opts.onFileRemove(file);
+			                		opts.onFileRemove.call(instance, file);
 			                	}
 			                    uploader.removeFile( file );
 			                    return;
@@ -254,6 +262,15 @@
 			            } else {
 			                $wrap.css( 'filter', 'progid:DXImageTransform.Microsoft.BasicImage(rotation='+ (~~((file.rotation/90)%4 + 4)%4) +')');
 			            }
+			        });
+			        $li.css({
+			        	height: thumbHeight,
+			        	width: thumbWidth
+			        });
+			        $wrap.css({
+			        	height: thumbHeight,
+			        	width: thumbWidth,
+			        	lineHeight: thumbHeight+"px"
 			        });
 			        $li.appendTo( $queue );
 			    }
@@ -323,23 +340,24 @@
 			                $wrap.find( '.pick-other' ).removeClass( 'element-invisible');
 			                $queue.parent().addClass('filled');
 			                $queue.show();
-			                $statusBar.removeClass('element-invisible');
+			                if(showStatusBar)
+			                	$statusBar.removeClass('element-invisible');
 			                uploader.refresh();
 			                break;
 
 			            case 'uploading':
 			                $wrap.find( '.pick-other' ).addClass( 'element-invisible' );
-			                $progress.show();
+			                $progress.css("visibility", "");//.show();
 			                $upload.text( '暂停上传' );
 			                break;
 
 			            case 'paused':
-			                $progress.show();
+			                $progress.css("visibility", "");//.show();
 			                $upload.text( '继续上传' );
 			                break;
 
 			            case 'confirm':
-			                $progress.hide();
+			                $progress.css("visibility", "hidden");//.hide();
 			                $upload.text( opts.uploadLabel||'开始上传' );//.addClass( 'disabled' );
 			                $wrap.find( '.pick-other' ).removeClass( 'element-invisible');
 
@@ -374,7 +392,7 @@
 			    };
 
 			    uploader.onUploadSuccess = function( file, response ) {
-			       opts.onFileUpload(file, response);
+			       opts.onFileUpload.call(instance, file, response);
 			    };
 
 			    uploader.onFileQueued = function( file ) {
@@ -383,7 +401,8 @@
 
 			        if ( fileCount === 1 ) {
 			            $placeHolder.addClass( 'element-invisible' );
-			            $statusBar.show();
+			            if(showStatusBar)
+		                	$statusBar.show();
 			        }
 
 			        addFile( file );
