@@ -1,10 +1,10 @@
 /**
  * Created by liyy on 2014/8/26.
  */
-(function (window, document, undefined) {
+(function (root, doc, undefined) {
     var msie, 
-    	_joy = window.joy,
-        joy = window.joy || (window.joy = {}),
+    	_joy = root.joy,
+        joy = root.joy || (root.joy = {}),
         joyModule;
 
     msie = parseInt((/msie (\d+)/.exec(navigator.userAgent.toLowerCase()) || [])[1]);
@@ -95,7 +95,7 @@
     ensure(joy, 'module', function () {
         var modules = {};
         return function module(name, config) {
-            if (config == undefined)
+            if (config === undefined)
                 return modules[name];
 
             var config = config || {};
@@ -114,9 +114,9 @@
 
     ensure(joy, 'service', function () {
         var services = {};
-        return function module(name, factory) {
+        return function service(name, factory) {
             if (factory == undefined)
-                return services[name];
+                return services[name]|| root[name];
 
             if (!factory || typeof factory != "function")
                 return null;
@@ -125,38 +125,75 @@
         };
     });
 
+    ensure(joy, 'jqplugin', function () {
+        var services = {};
+        return function jqplugin(name, deps, factory) {
+            if ( arguments.length === 2 ) {
+                factory = deps;
+                deps = null;
+            }
+
+            if ( typeof factory === 'function' ) {
+                var args = [], len;
+                if(deps){
+                    len = deps.length || (deps = [deps]);
+                    for( var i = 0; i < len; i++ ) {
+                        args.push( joy.service( deps[ i ] ) );
+                    }
+                }
+
+                var pluginConstructor = factory.apply(null, args);
+                if(!pluginConstructor)
+                    throw new Error('need provoid plugin constructor!');
+
+                (function( factory ) {
+                    if ( typeof define === "function" && define.amd ) {
+                        define( ["jquery"], factory );
+                    } else {
+                        factory( root.jQuery );
+                    }
+                }(function( $ ) {
+                    if(!$)
+                        throw new Error('jQuery not found!');
+                    var pluginKey = "joy-jqp-"+name;
+                    $.fn[name] = function(options){
+                        if (isString(options)) {
+                            var args = Array.prototype.slice.call(arguments, 1);
+                            var res;
+                            this.each(function() {
+                                var plugin = $.data(this, pluginKey);
+                                //if options=="options" then set options... TODO
+                                if (plugin && $.isFunction(plugin[options])) {
+                                    var r = plugin[options].apply(plugin, args);
+                                    if (res === undefined)
+                                        res = r;
+                                }
+                            });
+                            return res!==undefined?res:this;
+                        }else if(options===undefined && this.length==1){
+                            var plugin = $.data(this, pluginKey);
+                            if(plugin)
+                                return plugin;
+                        }
+
+                        this.each(function() {
+                            var plugin = $.data(this, pluginKey);
+                            if(!plugin)
+                                plugin = $.data(this, pluginKey, new pluginConstructor(this, pluginKey, options));
+                        });
+
+                        return this;
+                    };
+
+                }));
+            }
+        };
+    });
+
     function bootstrap() {
 
     }
     
-    function jqueryPlugin(pluginKey, pluginConstructor){
-    	return function(options){
-    		if (isString(options)) {
-    			var args = Array.prototype.slice.call(arguments, 1);
-    			var res;
-    			this.each(function() {
-    				var plugin = $.data(this, pluginKey);
-    				if (plugin && $.isFunction(plugin[options])) {
-    					var r = plugin[options].apply(plugin, args);
-    					if (res === undefined) 
-    						res = r;
-    				}
-    			});
-    			return res!==undefined?res:this;
-    		}
-    		
-    		this.each(function() {
-    			var plugin = $.data(this, pluginKey);
-    			if(!plugin)
-    				plugin = $.data(this, pluginKey, new pluginConstructor(this, options));
-    			else if(isFunction(plugin.update))
-    				plugin.update(options);
-    		});
-    		
-    		return this;
-    	}
-    }
-
     //publish external API
     joy.noop = noop;
     joy.version = version;
@@ -169,8 +206,7 @@
         'noop':noop,
         'isString': isString,
         'isFunction': isFunction,
-        'isArray': isArray,
-        'jqp': jqueryPlugin
+        'isArray': isArray
     });
 
 })(window, document);
