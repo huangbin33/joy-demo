@@ -2,16 +2,16 @@
 <%@ include file="common.jsp" %>
 <html>
 <script type="text/javascript" src="${ctx}/js/jquery/jquery-1.11.1.js"></script>
-<script type="text/javascript" src="${ctx}/js/joy/joy.core.js"></script>
-<script type="text/javascript" src="${ctx}/js/joy/joy.service.js"></script>
+<script type="text/javascript" src="${ctx}/js/joy/core.js"></script>
+<script type="text/javascript" src="${ctx}/js/joy/service/validate.js"></script>
 <!--[if lt IE 9]>
 <script src="${ctx}/js/webuploader/vendor/html5shiv.js"></script>
 <script src="${ctx}/js/webuploader/vendor/respond.min.js"></script>
 <![endif]-->
 <script type="text/javascript" src="${ctx}/js/webuploader/webuploader.js"></script>
-<script type="text/javascript" src="${ctx}/js/joy/joy.jqp.uploader.js"></script>
+<script type="text/javascript" src="${ctx}/js/joy/plugin/jquery/uploader/uploader.js"></script>
 <link rel="stylesheet" type="text/css" href="${ctx}/css/webuploader/webuploader.css">
-<link rel="stylesheet" type="text/css" href="${ctx}/css/joy/joy.jqp.uploader.css">
+<link rel="stylesheet" type="text/css" href="${ctx}/css/joy/plugin/jquery/uploader/uploader.css">
 <style>
 #jqp-wrap .statusBar div.btns{
 	position: static;
@@ -32,7 +32,7 @@ $(function(){
         //auto: true,
         thumbWidth: 250,
 		thumbHeight: 250,
-		showStatusBar: false,
+		showStatusBar: true,
         baseOpts:{
             fileNumLimit: 10,
             server: '${uploadURL4Json}'
