@@ -55,17 +55,38 @@
                 
                 show: function(){
                     this.$mask.show();
+                    this._setTimeout();
+                    var callback = this.options.callback;
+                    if(joy.isFunction(callback))
+                    	callback.call(this);
                 },
                 
                 hide: function(){
                 	this.$mask.hide();
+                	this._clearTimeout();
                 },
                 
                 close: function(){
                 	this._destroy();
                 },
+                
+                _setTimeout: function(){
+                	if(this.options.timeout>0){
+                        var instance = this;
+                    	this.$timeout = window.setTimeout(function(){
+                            instance.close();
+                            instance = null;
+                        }, this.options.timeout);
+                    }
+                },
+                
+                _clearTimeout: function(){
+                	if(this.$timeout)
+                		window.clearTimeout(this.$timeout);
+                },
 
                 _destroy: function(){
+                	this._clearTimeout();
                     this.$mask.remove();
                     $.removeData(this.$el[0], this.pluginKey);
                 }
