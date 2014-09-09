@@ -9,9 +9,9 @@
 <script src="${ctx}/js/webuploader/vendor/respond.min.js"></script>
 <![endif]-->
 <script type="text/javascript" src="${ctx}/js/webuploader/webuploader.js"></script>
-<script type="text/javascript" src="${ctx}/js/joy/plugin/jquery/uploader/uploader.js"></script>
+<script type="text/javascript" src="${ctx}/js/joy/plugin/jquery/uploader.js"></script>
 <link rel="stylesheet" type="text/css" href="${ctx}/css/webuploader/webuploader.css">
-<link rel="stylesheet" type="text/css" href="${ctx}/css/joy/plugin/jquery/uploader/uploader.css">
+<link rel="stylesheet" type="text/css" href="${ctx}/css/joy/plugin/jquery/uploader.css">
 <style>
 #jqp-wrap .statusBar div.btns{
 	position: static;
