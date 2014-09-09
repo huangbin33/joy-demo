@@ -14,9 +14,8 @@
 </html>
 <script>
 function startLoading(){
-    $(document.body).joyloading();
-    setTimeout(function(){
-       // $(document.body).joyloading("close");
-    }, 5000);
+    $(document.body).joyloading({
+    	timeout:3000
+    });
 }
 </script>
