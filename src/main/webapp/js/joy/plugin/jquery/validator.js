@@ -33,8 +33,12 @@
         });
 
         $.validator.addMethod("nick", function(value, element) {
-            return this.optional(element) || $validate.isMobile(value);
+            return this.optional(element) || $validate.isNickName(value, true, [4,20]);
         }, "请输入有效的昵称（4-20个字符，只能包含中文、字母、数字和下划线）");
+        
+        $.validator.addMethod("idcard_strict", function(value, element) {
+            return this.optional(element) || $validate.isStrictIDCard(value);
+        }, "请输入有效的身份证号");
 
         $.extend($.validator.defaults, {
             showErrors: function(errorMap, errorList){
