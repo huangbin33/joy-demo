@@ -127,7 +127,7 @@
 
     ensure(joy, 'jqplugin', function () {
         var services = {};
-        return function jqplugin(name, deps, factory) {
+        return function jqplugin(name, deps, factory, justExtend) {
             if ( arguments.length === 2 ) {
                 factory = deps;
                 deps = null;
@@ -143,6 +143,9 @@
                 }
 
                 var pluginConstructor = factory.apply(null, args);
+                if(justExtend===true)
+                	return;
+                
                 if(!pluginConstructor)
                     throw new Error('need provoid plugin constructor!');
 

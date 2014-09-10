@@ -1,0 +1,7 @@
+.joy-validator-wrap input.error{
+	/*border: 1px solid red;*/
+}
+.joy-validator-wrap label.error{
+	padding-left: 6px;
+	color: red;
+}
