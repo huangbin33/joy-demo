@@ -49,11 +49,21 @@ joy.validator = joy.service("validate", function() {
 		isIDCard : function(val) {
 			return regExs["IDCARD"].test(val);
 		},
+		isStrictIDCard : function(val) {
+			if(!regExs["IDCARD"].test(val))
+				return false;
+			//
+			
+			return true;
+		},
 		isMobile : function(val) {
 			return regExs["MOBILE"].test(val);
 		},
 		isPhone : function(val) {
 			return regExs["PHONE"].test(val);
+		},
+		isNickName : function(val, allowChinese, rangeLength){
+			
 		}
 	}
 });
