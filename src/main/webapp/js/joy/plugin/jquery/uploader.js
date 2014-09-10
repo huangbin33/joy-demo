@@ -117,7 +117,7 @@
                             multiple: multipleSupport
                         },
                         dnd: $wrap.find('.queueList')[0],
-                        paste: window.document.body,
+                        //paste: window.document.body,
                         //runtimeOrder : 'flash',
                         accept: [{
                             title: 'Images',
