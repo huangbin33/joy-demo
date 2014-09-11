@@ -63,6 +63,72 @@
 		$.validator.addMethod("business_license", function(value, element) {
 			return this.optional(element) || /^\d{15}$/.test(value);
 		}, "请输入有效的营业执照号");
+		
+		$.validator.addMethod("ajax", function( value, element, param ) {
+			if ( this.optional( element ) ) {
+				return "dependency-mismatch";
+			}
+
+			var previous = this.previousValue( element ),
+				validator, data;
+
+			if (!this.settings.messages[ element.name ] ) {
+				this.settings.messages[ element.name ] = {};
+			}
+			previous.originalMessage = this.settings.messages[ element.name ].ajax;
+			this.settings.messages[ element.name ].ajax = previous.message;
+
+			param = typeof param === "string" && { url: param } || param;
+			if(param.getUrl && typeof param.getUrl === "function")
+				param.url = param.getUrl(value, element);
+
+			if ( previous.old === value ) {
+				return previous.valid;
+			}
+
+			previous.old = value;
+			validator = this;
+			this.startRequest( element );
+			data = {};
+			data[ element.name ] = value;
+			$.ajax( $.extend( true, {
+				url: param,
+				type: "GET",
+				mode: "abort",
+				port: "validate" + element.name,
+				data: data,
+				context: validator.currentForm,
+				success: function( response ) {
+					var valid = response === true || response === "true" || response === param.validResult,
+						errors, message, submitted;
+
+					validator.settings.messages[ element.name ].ajax = previous.originalMessage;
+					if ( valid ) {
+						submitted = validator.formSubmitted;
+						validator.prepareElement( element );
+						validator.formSubmitted = submitted;
+						validator.successList.push( element );
+						delete validator.invalid[ element.name ];
+						validator.showErrors();
+					} else {
+						errors = {};
+						message = validator.defaultMessage( element, "ajax" );
+                        if(param.useResponseAsMessage)
+                            message = response || message;
+
+						errors[ element.name ] = previous.message = $.isFunction( message ) ? message( value ) : message;
+						validator.invalid[ element.name ] = true;
+						validator.showErrors( errors );
+					}
+					previous.valid = valid;
+					validator.stopRequest( element, valid );
+
+                    if(param.callback && typeof param.callback === "function")
+                        param.callback(value, element, valid);
+				}
+			}, param ) );
+			return "pending";
+		});
 
 		$.extend($.validator.defaults, {
 			showErrors : function(errorMap, errorList) {
