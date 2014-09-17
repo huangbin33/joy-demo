@@ -5,7 +5,7 @@ joy.validator = joy.service("validate", function() {
 	var regExs = {
 		"ASCII" : /^[\x00-\xFF]+$/, // ASCII
 		"ALPHA_DIGIT" : /^[a-zA-Z0-9]+$/, //字母或数字
-		"CHINESE" : /^\u4E00-\u9FA5\uF900-\uFA2D$/, // 中文
+		"CHINESE" : /^[\u4E00-\u9FA5\uF900-\uFA2D]+$/, // 中文
 		"INTEGER" : /^(-?[1-9]\d*|0)$/, // 整数
 		"POSITIVE_INTEGER" : /^[1-9]\d*$/, // 正整数
 		"NEGATIVE_INTEGER" : /^-[1-9]\d*$/, // 负整数
