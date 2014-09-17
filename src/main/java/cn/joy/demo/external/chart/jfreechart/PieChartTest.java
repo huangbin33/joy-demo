@@ -81,7 +81,7 @@ public class PieChartTest {
 		dataset.setValue("城管强拆", 210);
 		dataset.setValue("医疗事故", 91);
 		dataset.setValue("其他", 66);
-
+		
 		ChartUtilities.saveChartAsPNG(new File("D:/pie.png"), create2DChart(dataset), 650, 400);
 		ChartUtilities.saveChartAsPNG(new File("D:/pie_3D.png"), create3DChart(dataset), 650, 400);
 
