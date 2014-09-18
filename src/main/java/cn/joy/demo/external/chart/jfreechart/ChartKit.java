@@ -193,7 +193,7 @@ public class ChartKit {
 				dataParam
 			).create().toFile();
 		System.out.println(path);
-		
+		 
 		//Line
 		path = ChartKit.factory(ChartKit.Type.LINE).config(
 				JoyParam.create().put("title", "水果销量统计图")

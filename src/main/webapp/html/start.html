@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app>
+<html ng-app="myApp">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="../js/angular.js"></script>
@@ -20,6 +20,7 @@
 </body>
 </html>
 <script>
+angular.module("myApp", []);
 	function StartUpController($scope) {
 		$scope.computeNeeded = function() {
 			$scope.needed = $scope.startingEstimate * 10;
