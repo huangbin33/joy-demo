@@ -1,6 +1,9 @@
 package cn.joy.demo.external.chart.jfreechart;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,8 +13,9 @@ import cn.joy.demo.external.chart.jfreechart.creator.BarChartCreator;
 import cn.joy.demo.external.chart.jfreechart.creator.LineChartCreator;
 import cn.joy.demo.external.chart.jfreechart.creator.PieChartCreator;
 import cn.joy.framework.core.JoyParam;
-import cn.joy.framework.kits.JsonKit;
+import cn.joy.framework.kits.DateKit;
 import cn.joy.framework.kits.NumberKit;
+import cn.joy.framework.kits.StringKit;
 
 import com.jfinal.plugin.activerecord.Record;
 
@@ -47,56 +51,55 @@ public class ChartKit {
 		return creator.config(configs).data(datas);
 	}
 	
-	public static void main(String[] args) throws Exception{
-		AbstractChartCreator.baseDir = "D:/charts";
-		
-		Object[][] datas = {
-			{"苹果", "鹤壁", 1230},
-			{"苹果", "西安", 1110},
-			{"苹果", "深圳", 1120},
-			{"苹果", "北京", 1210},
-			{"香蕉", "鹤壁", 720},
-			{"香蕉", "西安", 750},
-			{"香蕉", "深圳", 860},
-			{"香蕉", "北京", 800},
-			{"橘子", "鹤壁", 830},
-			{"橘子", "西安", 780},
-			{"橘子", "深圳", 790},
-			{"梨子", "北京", 450},
-			{"橘子", "北京", 700},
-			{"梨子", "鹤壁", 400},
-			{"梨子", "西安", 380},
-			{"梨子", "深圳", 390},
-			{"梨子", "北京", 450}
-		};
-		
-		List<Record> records = new ArrayList();
-		for(int i=0;i<datas.length;i++){
-			Record record = new Record();
-			record.set("rowField", datas[i][0]);
-			record.set("colField", datas[i][1]);
-			record.set("valueField", datas[i][2]);
-			records.add(record);
+	private static String handleKey(String key, String handleWay){
+		if(StringKit.isEmpty(key))
+			return "";
+		if(handleWay.startsWith("d_")){
+			String dateStr = DateKit.fillDateStr(key);
+			try {
+				Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStr);
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(date);
+				
+				int year = cal.get(Calendar.YEAR);
+				int month = cal.get(Calendar.MONTH)+1;
+				
+				if("d_year".equals(handleWay)){
+					return String.format("%4d年", year);
+				}else if("d_season".equals(handleWay)){
+					return String.format("%4d年%d季度", year, (month-1)/3+1);
+				}else if("d_month".equals(handleWay)){
+					return String.format("%4d年%d月", year, month);
+				}else if("d_day".equals(handleWay)){
+					return new SimpleDateFormat("yyyy-MM-dd").format(date);
+				}
+			} catch (Exception e) {
+				return "INVALID";
+			}
 		}
-		
-		String statWays = "sum";	//sum count
-		List<String> rowKeyList = new ArrayList();
-		List<String> colKeyList = new ArrayList();
+			
+		return key;
+	}
+	
+	public static JoyParam statDatas(List<Record> records, String statWays, String rowField, String rowHandleWay, 
+			String colField, String colHandleWay, String valueField){
+		List<String> rowKeyList = new ArrayList<String>();
+		List<String> colKeyList = new ArrayList<String>();
 		Map<String, Double> datasMap = new HashMap<String, Double>();
 		
 		for(Record record:records){
-			String rowKey = record.getStr("rowField");
+			String rowKey = handleKey(record.getStr(rowField), rowHandleWay);
 			if(!rowKeyList.contains(rowKey))
 				rowKeyList.add(rowKey);
 			
-			String colKey = record.getStr("colField");
+			String colKey = handleKey(record.getStr(colField), colHandleWay);
 			if(!colKeyList.contains(colKey))
 				colKeyList.add(colKey);
 			
 			String datasMapKey = rowKey+"__DSP__"+colKey;
 			double val = NumberKit.getDouble(datasMap.get(datasMapKey), 0d);
 			if("sum".equals(statWays)){
-				Double value = NumberKit.getDouble(record.get("valueField"));
+				Double value = NumberKit.getDouble(record.get(valueField));
 				if(value==null)
 					continue;
 				datasMap.put(datasMapKey, val+value);
@@ -114,20 +117,92 @@ public class ChartKit {
 			}
 		}
 		
-		//double[][] data = new double[][] {{1230,1110,1120,1210}, {720,750,860,800}, {830,780,790,700,}, {400,380,390,450}};
-		//String[] rowKeys = {"苹果", "香蕉", "橘子", "梨子"};
-		//String[] columnKeys = {"鹤壁","西安","深圳","北京"};
+		return JoyParam.create().put("rowKeys", rowKeys).put("columnKeys", columnKeys)
+				.put("data", data);
+	}
+	
+	public static void main(String[] args) throws Exception{
+		AbstractChartCreator.baseDir = "D:/charts";
+		
+		Object[][] datas = {
+			{"苹果", "鹤壁", 1230},
+			{"苹果", "西安", 1110},
+			{"苹果", "深圳", 1120},
+			{"香蕉", "鹤壁", 700},
+			{"苹果", "北京", 1210},
+			{"香蕉", "西安", 720},
+			{"香蕉", "深圳", 750},
+			{"香蕉", "西安", 860},
+			{"香蕉", "北京", 800},
+			{"橘子", "鹤壁", 830},
+			{"橘子", "深圳", 780},
+			{"橘子", "西安", 580},
+			{"橘子", "北京", 790},
+			{"梨子", "鹤壁", 450},
+			{"橘子", "北京", 700},
+			{"梨子", "深圳", 380},
+			{"梨子", "西安", 390},
+			{"梨子", "北京", 350}
+			/*{"苹果", "2014-01-12 11:22:33", 1230},
+			{"苹果", "2014-02-12 11:22", 1110},
+			{"苹果", "2014-05-12 11", 1120},
+			{"香蕉", "2014-06-12", 700},
+			{"苹果", "2014-09-12", 1210},
+			{"香蕉", "2014-01-12 11:22:33", 720},
+			{"香蕉", "2014-02-12 11:22", 750},
+			{"香蕉", "2014-05-12 11", 860},
+			{"香蕉", "2014-09-12", 800},
+			{"橘子", "2014-01-12 11:22:33", 830},
+			{"橘子", "2014-02-12 11:22", 780},
+			{"橘子", "2014-06-12 11:22", 580},
+			{"橘子", "2014-05-12 11", 790},
+			{"梨子", "2014-09-12", 450},
+			{"橘子", "2014-09-12", 700},
+			{"梨子", "2014-01-12 11:22:33", 400},
+			{"梨子", "2014-02-12 11:22", 380},
+			{"梨子", "2014-05-12 11", 390},
+			{"梨子", "2014-09-12", 450},
+			{"梨子", "2014-11-12", 350}*/
+		};
+		
+		List<Record> records = new ArrayList<Record>();
+		for(int i=0;i<datas.length;i++){
+			Record record = new Record();
+			record.set("rowField", datas[i][0]);
+			record.set("colField", datas[i][1]);
+			record.set("valueField", datas[i][2]);
+			records.add(record);
+		}
+		
+		JoyParam dataParam = statDatas(records, "sum", "rowField", "", "colField", "", "valueField");
 		
 		//Bar
 		String path = ChartKit.factory(ChartKit.Type.BAR).config(
 				JoyParam.create().put("title", "水果销量统计图")
 					.put("categoryLabel", "水果").put("valueLabel", "销量")
+					.put("width", 1000)
 			).data(
-				JoyParam.create().put("rowKeys", rowKeys).put("columnKeys", columnKeys)
-					.put("data", data)
+				dataParam
 			).create().toFile();
 		System.out.println(path);
 		
+		//Pie
+		path = ChartKit.factory(ChartKit.Type.PIE).config(
+				JoyParam.create().put("title", "苹果销量统计图")
+			).data(
+				dataParam
+			).create().toFile();
+		System.out.println(path);
+		
+		//Line
+		path = ChartKit.factory(ChartKit.Type.LINE).config(
+				JoyParam.create().put("title", "水果销量统计图")
+					.put("categoryLabel", "水果").put("valueLabel", "销量")
+					.put("3D", false)
+			).data(
+				dataParam
+			).create().toFile();
+		System.out.println(path);
 		
 	}
 }
