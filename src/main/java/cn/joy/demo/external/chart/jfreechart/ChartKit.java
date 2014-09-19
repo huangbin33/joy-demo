@@ -21,7 +21,15 @@ import com.jfinal.plugin.activerecord.Record;
 
 public class ChartKit {
 	public static enum Type{
-		BAR, PIE, LINE
+		BAR, PIE, LINE;
+		
+		public static Type getType(String name){
+			try {
+				return Type.valueOf(name.toUpperCase());
+			} catch (Exception e) {
+				return Type.BAR;
+			}
+		}
 	}
 	
 	public static ChartCreator factory(Type type){
@@ -54,6 +62,7 @@ public class ChartKit {
 	private static String handleKey(String key, String handleWay){
 		if(StringKit.isEmpty(key))
 			return "";
+		handleWay = StringKit.getString(handleWay);
 		if(handleWay.startsWith("d_")){
 			String dateStr = DateKit.fillDateStr(key);
 			try {
@@ -88,11 +97,11 @@ public class ChartKit {
 		Map<String, Double> datasMap = new HashMap<String, Double>();
 		
 		for(Record record:records){
-			String rowKey = handleKey(record.getStr(rowField), rowHandleWay);
+			String rowKey = handleKey(StringKit.getString(record.get(rowField)), rowHandleWay);
 			if(!rowKeyList.contains(rowKey))
 				rowKeyList.add(rowKey);
 			
-			String colKey = handleKey(record.getStr(colField), colHandleWay);
+			String colKey = handleKey(StringKit.getString(record.get(colField)), colHandleWay);
 			if(!colKeyList.contains(colKey))
 				colKeyList.add(colKey);
 			
@@ -122,7 +131,7 @@ public class ChartKit {
 	}
 	
 	public static void main(String[] args) throws Exception{
-		AbstractChartCreator.baseDir = "D:/charts";
+		AbstractChartCreator.baseDir = "D:/charts2";
 		
 		Object[][] datas = {
 			{"苹果", "鹤壁", 1230},
