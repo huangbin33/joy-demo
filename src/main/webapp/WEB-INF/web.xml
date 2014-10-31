@@ -3,21 +3,13 @@
 	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	id="WebApp_ID" version="2.5">
-	
-	<!-- <context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>
-			/WEB-INF/webtestApp.xml
-		</param-value>
-	</context-param> -->
 
-	<!-- <listener>
-		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
-		</listener-class>
-	</listener>
-	 -->
-	
+	<!-- <context-param> <param-name>contextConfigLocation</param-name> <param-value> 
+		/WEB-INF/webtestApp.xml </param-value> </context-param> -->
+
+	<!-- <listener> <listener-class> org.springframework.web.context.ContextLoaderListener 
+		</listener-class> </listener> -->
+
 	<filter>
 		<filter-name>jfinal</filter-name>
 		<filter-class>com.jfinal.core.JFinalFilter</filter-class>
@@ -26,26 +18,24 @@
 			<param-value>cn.joy.demo.business.AppConfig</param-value>
 		</init-param>
 	</filter>
-	
+
 	<filter-mapping>
 		<filter-name>jfinal</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	
-	
-	<!-- 
+
 	<servlet>
-		<servlet-name>web-test</servlet-name>
-		<servlet-class>
-			org.springframework.web.servlet.DispatcherServlet
-		</servlet-class>
-		<load-on-startup>1</load-on-startup>
+		<servlet-name>DisplayChart</servlet-name>
+		<servlet-class>org.jfree.chart.servlet.DisplayChart</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>web-test</servlet-name>
-		<url-pattern>*.do</url-pattern>
-	</servlet-mapping> -->
-	
+		<servlet-name>DisplayChart</servlet-name>
+		<url-pattern>/DisplayChart</url-pattern>
+	</servlet-mapping>
+	<!-- <servlet> <servlet-name>web-test</servlet-name> <servlet-class> org.springframework.web.servlet.DispatcherServlet 
+		</servlet-class> <load-on-startup>1</load-on-startup> </servlet> <servlet-mapping> 
+		<servlet-name>web-test</servlet-name> <url-pattern>*.do</url-pattern> </servlet-mapping> -->
+
 	<welcome-file-list>
 		<welcome-file>
 			index.jsp
