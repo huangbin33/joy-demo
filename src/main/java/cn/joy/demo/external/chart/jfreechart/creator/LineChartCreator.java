@@ -4,20 +4,18 @@ import java.awt.Color;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.labels.ItemLabelAnchor;
-import org.jfree.chart.labels.ItemLabelPosition;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.BarRenderer3D;
-import org.jfree.ui.TextAnchor;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 
 public class LineChartCreator extends CategoryChartCreator {
 
 	public JFreeChart create2D() {
-		JFreeChart chart = ChartFactory.createLineChart(this.title, this.categoryLabel, this.valueLabel, dataset,
+		JFreeChart chart = ChartFactory.createLineChart(this.title,
+				this.categoryLabel, this.valueLabel, dataset,
 				PlotOrientation.VERTICAL, true, true, false);
-		
+
 		// 使用CategoryPlot设置各种参数。以下设置可以省略。
 		CategoryPlot plot = (CategoryPlot) chart.getPlot();
 		// 背景色 透明度
@@ -38,21 +36,21 @@ public class LineChartCreator extends CategoryChartCreator {
 
 		// 拆线线设置
 		// 显示数据
-		/*
-		 * LineAndShapeRenderer renderer = (LineAndShapeRenderer)
-		 * plot.getRenderer(); renderer.setItemLabelGenerator(new
-		 * StandardCategoryItemLabelGenerator()); // 设置曲线样式
-		 * renderer.setPaint(Color.GREEN); renderer.setItemLabelsVisible(true);
-		 * renderer.setShapesVisible(true);
-		 */
+
+		LineAndShapeRenderer renderer = (LineAndShapeRenderer) plot
+				.getRenderer();
+		renderer.setItemLabelGenerator(new StandardCategoryItemLabelGenerator()); // 设置曲线样式
+		renderer.setItemLabelsVisible(true);
+		renderer.setShapesVisible(true);
 
 		return chart;
 	}
 
 	public JFreeChart create3D() {
-		JFreeChart chart = ChartFactory.createLineChart3D(this.title, this.categoryLabel, this.valueLabel, dataset,
+		JFreeChart chart = ChartFactory.createLineChart3D(this.title,
+				this.categoryLabel, this.valueLabel, dataset,
 				PlotOrientation.VERTICAL, true, true, false);
-		
+
 		// 使用CategoryPlot设置各种参数。以下设置可以省略。
 		CategoryPlot plot = (CategoryPlot) chart.getPlot();
 		// 背景色 透明度
