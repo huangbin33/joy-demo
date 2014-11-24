@@ -45,11 +45,7 @@ public class BatchImportParser {
 		System.out.println("Heap committed=" + commit + " init=" + init + " max=" + max + " used=" + used);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
 		System.out.println("---START---" + sdf.format(new Date()));
-		// List<Map<String, String>> rowList = parseBatchImport( log,
-		// "E:/temp/������.xls");
-		List<Map<String, String>> rowList = BatchImportParser.parseBatchImport(log, "D:/ffffffff.xlsx");
-		// List<Map<String, String>> rowList = parseBatchImport( log,
-		// "E:/temp/������Ʊ.xlsx");
+		List<Map<String, String>> rowList = BatchImportParser.parseBatchImport(log, "D:/jiangsu20140107.xlsx");
 		log.debug(" row size = " + rowList.size());
 		System.out.println("---END1---" + sdf.format(new Date()));
 		for (Map<String, String> rowMap : rowList) {

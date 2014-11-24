@@ -34,7 +34,7 @@ public class BigExcelParser{
 		SheetDatasHandler handler = UtilPoi.read(file);
 		end = System.currentTimeMillis();
 		System.out.println("耗时：" + (end - start) / 1000f + "s");
-		List<List<Object>> sheet = handler.getSheetData(0);
+		List<Object[]> sheet = handler.getSheetData(0);
 		System.out.println("sheet 大小：" + sheet.size());
 		System.out.println("sheet[0]" + sheet.get(0));
 		int i = new Random().nextInt(sheet.size());
@@ -50,7 +50,7 @@ public class BigExcelParser{
 		Path file = Paths.get("/home/skzrorg/tmp/xlsx/IPTABLE.xlsx");
 		UtilPoi.read(file, new RowMapper(){
 			@Override
-			void mapRow(int sheetIndex, int rowIndex, List<Object> row){
+			void mapRow(int sheetIndex, int rowIndex, Object[] row){
 				rowCount++;
 			}
 		});
@@ -92,14 +92,14 @@ class UtilPoi{
 
 class SheetDatasHandler extends RowMapper{
 	private int bufRowSize, curSheetIndex = -1;
-	private List<List<List<Object>>> sheetDatas = new ArrayList<>();
-	private List<List<Object>> sheetData;
+	private List<List<Object[]>> sheetDatas = new ArrayList<>();
+	private List<Object[]> sheetData;
 
-	public List<List<List<Object>>> getSheetDatas(){
+	public List<List<Object[]>> getSheetDatas(){
 		return sheetDatas;
 	}
 
-	public List<List<Object>> getSheetData(int sheetIndex){
+	public List<Object[]> getSheetData(int sheetIndex){
 		return sheetDatas.get(sheetIndex);
 	}
 
@@ -108,7 +108,7 @@ class SheetDatasHandler extends RowMapper{
 	}
 
 	@Override
-	void mapRow(int sheetIndex, int rowIndex, List<Object> row){
+	void mapRow(int sheetIndex, int rowIndex, Object[] row){
 		if(curSheetIndex != sheetIndex){
 			sheetData = new ArrayList<>(sheetIndex == 0 ? bufRowSize : sheetData.size() / 2);
 			sheetDatas.add(sheetData);
@@ -122,8 +122,8 @@ class SheetDatasHandler extends RowMapper{
 abstract class RowMapper extends DefaultHandler{
 	private SharedStringsTable sst;
 	private Map<Integer, String> strMap;
-	private int sheetIndex = -1, rowIndex = -1;
-	private List<Object> row;
+	private int sheetIndex = -1, rowIndex = -1, colIndex = -1, maxColNum = 26;
+	private Object[] row;
 	private String cellS;
 	private String cellType;
 	private boolean valueFlag;
@@ -142,6 +142,7 @@ abstract class RowMapper extends DefaultHandler{
 		cellType = null;
 		value = null;
 		rowIndex = 0;
+		colIndex = -1;
 	}
 
 	private Object convertCellValue(){
@@ -167,10 +168,12 @@ abstract class RowMapper extends DefaultHandler{
 			sheetIndex++;
 		} else if("row".equals(name)){
 			rowIndex++;
-			row = new ArrayList<>();
+			row = new Object[maxColNum];
 		} else if("c".equals(name)){
 			cellS = attributes.getValue("s");
 			cellType = attributes.getValue("t");
+			String r = attributes.getValue("r");
+			colIndex = r.codePointAt(0) - 65;
 		} else if("v".equals(name)){
 			valueFlag = true;
 			value = new StringBuilder();
@@ -184,7 +187,7 @@ abstract class RowMapper extends DefaultHandler{
 		} else if("row".equals(name)){
 			mapRow(sheetIndex, rowIndex, row);
 		} else if("v".equals(name)){
-			row.add(convertCellValue());
+			row[colIndex] = convertCellValue();
 			valueFlag = false;
 		}
 	}
@@ -195,5 +198,5 @@ abstract class RowMapper extends DefaultHandler{
 			value.append(ch, start, length);
 	}
 
-	abstract void mapRow(int sheetIndex, int rowIndex, List<Object> row);
+	abstract void mapRow(int sheetIndex, int rowIndex, Object[] row);
 }

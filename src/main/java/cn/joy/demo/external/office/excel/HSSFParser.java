@@ -26,7 +26,6 @@ public class HSSFParser {
 			is = pfs.createDocumentInputStream("Workbook");
 
 			HSSFRequest request = new HSSFRequest();
-			// ���Ϊ�������͵�Record��ע���˼��������������ȷ�Ļ���������addListener��������ָ�������Record����
 			HSSFExcelParseListener hepl = new HSSFExcelParseListener();
 			request.addListenerForAllRecords(hepl);
 

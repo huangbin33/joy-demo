@@ -42,7 +42,7 @@ public class HSSFExcelParseListener implements HSSFListener {
 			return;
 		}
 		value = value.trim();
-		if (row == 0) {// ��ͷ
+		if (row == 0) {
 			log.debug("title = " + value);
 			titleMap.put(column, value);
 		} else if (titleMap.containsKey(column)) {
@@ -58,7 +58,6 @@ public class HSSFExcelParseListener implements HSSFListener {
 		}
 	}
 
-	// ��¼��4�ַ��
 	private SSTRecord strRec;
 
 	public void processRecord(Record record) {
@@ -66,62 +65,51 @@ public class HSSFExcelParseListener implements HSSFListener {
 		case BOFRecord.sid:
 			BOFRecord br = (BOFRecord) record;
 			switch (br.getType()) {
-			case BOFRecord.TYPE_WORKBOOK: // ˳������µ�Workbook
-				log.debug("��workbook");
+			case BOFRecord.TYPE_WORKBOOK: //
+				log.debug("workbook");
 				break;
-			case BOFRecord.TYPE_WORKSHEET:// ˳������µ�Worksheet����ΪEvent
-											// API�����Excel�ļ����������ݽṹ����j��4���������һ��Ҫ��¼���ڽ���ڼ���sheet�ˡ�
-				log.debug("��worksheet");
+			case BOFRecord.TYPE_WORKSHEET://
+				log.debug("worksheet");
 				break;
 			}
 			break;
-		case BoundSheetRecord.sid: // ��¼sheet����������е�sheet��˳���ӡ��4������ж��sheet�Ļ�������˳����뵽һ��List��
+		case BoundSheetRecord.sid: 
 			BoundSheetRecord bsr = (BoundSheetRecord) record;
-			log.debug("sheetName��" + bsr.getSheetname());
+			log.debug("sheetName" + bsr.getSheetname());
 			break;
-		case SSTRecord.sid: // ��¼�ַ��
+		case SSTRecord.sid: 
 			strRec = (SSTRecord) record;
-			// log.debug("�ַ��");
 			break;
-		case RowRecord.sid: // ��ӡ�У�����ô�����
+		case RowRecord.sid: 
 			RowRecord rr = (RowRecord) record;
-			// log.debug("�У�"+rr.getRowNumber()+"�� �_ʼ��:"+rr.getFirstCol()+", �K���У�"+rr.getLastCol());
 			break;
-		case NumberRecord.sid: // �����������͵�cell����Ϊ���ֺ����ڶ���������ʽ����������һ��Ҫ�ж��ǲ������ڸ�ʽ������Ĭ�ϵ�����Ҳ�ᱻ��Ϊ���ڸ�ʽ��������������ֵĻ���һ��Ҫ��ȷָ����ʽ��������������
+		case NumberRecord.sid: 
 			NumberRecord nr = (NumberRecord) record;
 			if (HSSFDateUtil.isInternalDateFormat(nr.getXFIndex())) {
 				String dateStr = sdf.format(HSSFDateUtil.getJavaDate(nr.getValue()));
 				parseRecord(nr.getRow(), nr.getColumn(), dateStr);
-				// log.debug("���ڣ�"+ dateStr +", ��:"+nr.getRow()+
-				// ", �У�"+nr.getColumn()+"����"+nr.getXFIndex()+"��");
 			} else {
 				parseRecord(nr.getRow(), nr.getColumn(), String.valueOf(nr.getValue()));
-				// log.debug("���֣�"+nr.getValue()+", ��:"+nr.getRow()+
-				// ", �У�"+nr.getColumn()+"����"+nr.getXFIndex()+"��");
 			}
 			break;
-		case LabelSSTRecord.sid: // �����ַ����ͣ����Ҫȡ�ַ��ֵ�Ļ��������indexȥ�ַ�����ȡ
+		case LabelSSTRecord.sid: 
 			LabelSSTRecord lsr = (LabelSSTRecord) record;
 			String value = String.valueOf(strRec.getString(lsr.getSSTIndex()));
 			parseRecord(lsr.getRow(), lsr.getColumn(), value);
-			// log.debug("������:"+value+",���У�"+lsr.getRow()+", �У�"+lsr.getColumn());
 			break;
 		case BoolErrRecord.sid: // boolean or error
 			BoolErrRecord ber = (BoolErrRecord) record;
 			if (ber.isBoolean()) {
 				String booleanvalue = String.valueOf(ber.getBooleanValue());
 				parseRecord(ber.getRow(), ber.getColumn(), booleanvalue);
-				// log.debug("Boolean:"+booleanvalue+", �У�"+ber.getRow()+", �У�"+ber.getColumn());
 			}
 			if (ber.isError()) {
-				// log.debug("Error:"+ber.getErrorValue()+", �У�"+ber.getRow()+", �У�"+ber.getColumn());
 			}
 			break;
 		case BlankRecord.sid:
 			BlankRecord br1 = (BlankRecord) record;
-			// log.debug("�ա����У�"+br1.getRow()+", �У�"+br1.getColumn());
 			break;
-		case FormulaRecord.sid: // ��ʽ
+		case FormulaRecord.sid: 
 			FormulaRecord fr = (FormulaRecord) record;
 			break;
 		}
