@@ -2,7 +2,23 @@ package cn.joy.demo.external.loan;
 
 
 public class LoanCaculator {
-	public static double caculateJieShengLiXi(double chushibenjin, double nianlilv, int zongqishu, int yihuanqishu, double tiqianhuankuanshuj){
+	public static double caculateShengYuBenJin(double chushibenjin, double nianlilv, int zongqishu, int yihuanqishu){
+		double A = chushibenjin;
+	    double b = nianlilv/12;
+	    double m = zongqishu;
+	    
+	    double X = A*b*Math.pow((1+b), m)/(Math.pow((1+b), m)-1);
+	    
+	    double bjA12 = A*Math.pow((1+b), yihuanqishu)-X*(Math.pow((1+b), yihuanqishu)-1)/b;
+	    System.out.println("剩余本金:"+bjA12);
+	    return bjA12;
+	}
+	
+	public static void main(String[] args) throws Exception{
+		caculateShengYuBenJin(1360000, 6.55/100, 20*12, 7);
+	}
+	
+	public static double caculateJieShengLiXi(double chushibenjin, double nianlilv, int zongqishu, int yihuanqishu, double tiqianhuankuanshu){
 		double A = chushibenjin;
 	    double b = nianlilv/12;
 	    double m = zongqishu;
@@ -19,7 +35,7 @@ public class LoanCaculator {
 	    
 	    //System.out.println("lx:"+(X*m-A));
 	    
-	    double tqh = tiqianhuankuanshuj;
+	    double tqh = tiqianhuankuanshu;
 	    
 	    double sybj = bjA12*(1)-(tqh);
 	    System.out.println("剩余本金:"+sybj);
@@ -36,7 +52,7 @@ public class LoanCaculator {
 	    return oldX*m-yhA12-(tqh)-X*sym;
 	}
 	
-	public static void main(String[] args) throws Exception{
+	public static void main1(String[] args) throws Exception{
 		double lx1 = caculateJieShengLiXi(1360000, 6.55/100, 20*12, 12, 300000);
 		
 		double lx2 = caculateJieShengLiXi(1360000, 6.55/100, 20*12, 12, 150000);
