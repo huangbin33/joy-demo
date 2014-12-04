@@ -2,6 +2,7 @@ package cn.joy.demo.external.email.receiver;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.security.Security;
 import java.util.Properties;
 
 import javax.mail.Flags.Flag;
@@ -34,9 +35,20 @@ public class IMAPReceiver{
 	public static void main(String[] args) throws Exception{
 		// 准备连接服务器的会话信息
 		Properties props = new Properties();
-		props.setProperty("mail.store.protocol", "imap");
+		props.setProperty("mail.store.protocol", "imap"); // 协议
 		props.setProperty("mail.imap.host", ReceiverConfig.imap);
-		props.setProperty("mail.imap.port", "143");
+		
+		if (ReceiverConfig.useSSL) {
+			Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+			final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+
+			props.setProperty("mail.imap.socketFactory.class", SSL_FACTORY);
+			props.setProperty("mail.imap.socketFactory.fallback", "false");
+			props.setProperty("mail.imap.port", "993");
+			props.setProperty("mail.imap.socketFactory.port", "993");
+		}else{
+			props.setProperty("mail.imap.port", "143"); // 端口
+		}
 
 		// 创建Session实例对象
 		Session session = Session.getInstance(props);
