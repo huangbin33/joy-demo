@@ -15,16 +15,18 @@ public class CompanyExcelParser{
 	private static int rowCount = -1;
 	private static int extraRowCount = 0;
 	private static int rc = 0;
-	private static int fileNum = 1;
+	private static int fileNum = 11;
 	private static FileOutputStream fos;
+	private static boolean needExtra = false;
 	private static FileOutputStream fosExtra;
 
 	public static void main(String[] args) throws Exception{
 		System.out.println();
 		long end, start = System.currentTimeMillis();
-		Path file = Paths.get("D:/jiangsu20140107.xlsx");
+		Path file = Paths.get("D:/shanghai20140107.xlsx");
 		
-		fosExtra = new FileOutputStream("D:/company_sql_extra.sql");
+		if(needExtra)
+			fosExtra = new FileOutputStream("D:/company_sql_extra.sql");
 		UtilPoi.read(file, new RowMapper(){
 			@Override
 			void mapRow(int sheetIndex, int rowIndex, Object[] row){
@@ -39,7 +41,7 @@ public class CompanyExcelParser{
 					}
 					
 					fos.write(getInsertSql(row, rowCount).getBytes());
-					if(extraRowCount<20000 && random.nextInt(4)==0){
+					if(needExtra && extraRowCount<20000 && random.nextInt(4)==0){
 						extraRowCount++;
 						fosExtra.write(getInsertSql(row, extraRowCount).getBytes());
 					}
@@ -62,11 +64,13 @@ public class CompanyExcelParser{
 			}
 		});
 		
-		try{
-			fosExtra.flush();
-			fosExtra.close();
-		} catch(IOException e){
-			e.printStackTrace();
+		if(needExtra){
+			try{
+				fosExtra.flush();
+				fosExtra.close();
+			} catch(IOException e){
+				e.printStackTrace();
+			}
 		}
 		
 		end = System.currentTimeMillis();
