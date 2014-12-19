@@ -40,7 +40,7 @@ public class SMTPSender{
 		props = new Properties();
 		props.setProperty("mail.transport.protocol", "smtp");
 		props.setProperty("mail.smtp.host", SenderConfig.smtp);
-		props.setProperty("mail.smtp.port", "25");
+		props.setProperty("mail.smtp.port", SenderConfig.port);
 		props.setProperty("mail.smtp.auth", "true");
 		props.setProperty("mail.debug", IS_ENABLED_DEBUG_MOD);
 	}
@@ -50,13 +50,13 @@ public class SMTPSender{
 		sendTextEmail();
 
 		// 发送简单的html邮件
-		sendHtmlEmail();
+		//sendHtmlEmail();
 
 		// 发送带内嵌图片的HTML邮件
-		sendHtmlWithInnerImageEmail();
+		//sendHtmlWithInnerImageEmail();
 
 		// 发送混合组合邮件
-		sendMultipleEmail();
+		//sendMultipleEmail();
 
 		// 发送已经生成的eml邮件
 		// sendMailForEml();
