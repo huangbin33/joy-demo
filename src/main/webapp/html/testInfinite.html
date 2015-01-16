@@ -1,0 +1,147 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="../js/jquery/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="../js/iscroll/iscroll-infinite.js"></script>
+<script type="text/javascript" src="../js/joy/core.js"></script>
+<script type="text/javascript"
+	src="../js/joy/plugin/jquery/infinite-list.js"></script>
+<style>
+* {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+html {
+	-ms-touch-action: none;
+}
+
+body,ul,li {
+	padding: 0;
+	margin: 0;
+	border: 0;
+}
+
+body {
+	font-size: 12px;
+	font-family: ubuntu, helvetica, arial;
+	overflow: hidden; /* this is important to prevent the whole page to bounce */
+}
+
+#wrapper {
+	position: absolute;
+	z-index: 1;
+	top: 45px;
+	bottom: 48px;
+	left: 0;
+	width: 100%;
+	background: #ccc;
+	overflow: hidden;
+}
+
+#scroller {
+	position: absolute;
+	z-index: 1;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	width: 100%;
+	-webkit-transform: translateZ(0);
+	-moz-transform: translateZ(0);
+	-ms-transform: translateZ(0);
+	-o-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-text-size-adjust: none;
+	-moz-text-size-adjust: none;
+	-ms-text-size-adjust: none;
+	-o-text-size-adjust: none;
+	text-size-adjust: none;
+}
+
+#scroller ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	text-align: left;
+	position: relative;
+}
+
+#scroller li {
+	position: absolute;
+	width: 100%;
+	top: 0;
+	left: 0;
+	-webkit-transform: translateZ(0);
+	-moz-transform: translateZ(0);
+	-ms-transform: translateZ(0);
+	-o-transform: translateZ(0);
+	transform: translateZ(0);
+	padding: 0 10px;
+	height: 40px;
+	line-height: 40px;
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #fff;
+	background-color: #fafafa;
+	font-size: 16px;
+}
+</style>
+</head>
+<body>
+	<div id="wrapper">
+		<div id="scroller">
+			<ul>
+				<li class="row">Row 1</li>
+				<li class="row">Row 2</li>
+				<li class="row">Row 3</li>
+				<li class="row">Row 4</li>
+				<li class="row">Row 5</li>
+				<li class="row">Row 6</li>
+				<li class="row">Row 7</li>
+				<li class="row">Row 8</li>
+				<li class="row">Row 9</li>
+				<li class="row">Row 10</li>
+				<li class="row">Row 11</li>
+				<li class="row">Row 12</li>
+				<li class="row">Row 13</li>
+				<li class="row">Row 14</li>
+				<li class="row">Row 15</li>
+
+				<li class="row">Row 16</li>
+				<li class="row">Row 17</li>
+				<li class="row">Row 18</li>
+				<li class="row">Row 19</li>
+				<li class="row">Row 20</li>
+				<li class="row">Row 21</li>
+				<li class="row">Row 22</li>
+				<li class="row">Row 23</li>
+				<li class="row">Row 24</li>
+				<li class="row">Row 25</li>
+				<li class="row">Row 26</li>
+				<li class="row">Row 27</li>
+				<li class="row">Row 28</li>
+				<li class="row">Row 29</li>
+				<li class="row">Row 30</li>
+			</ul>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	$(function() {
+		$("#wrapper").joyinfinitelist({
+			infiniteElements: '#scroller .row',
+			cacheSize: 100,
+    		dataset: function(start, count){
+    			console.log("start="+start+", count="+count);
+    		},
+    		dataFiller: function(el, data){
+    			console.log("el="+el+", data="+data);
+    		}
+		});
+	});
+</script>
+</html>
