@@ -13,6 +13,20 @@
 
         $.extend($.joyscrolllist, {
             defaults: {
+            	rowSelector: "ul > li",
+            	itemsPerPage: 10,
+            	text: {
+        			pullDownToRefresh: "下拉刷新",
+        			releaseToRefresh: "释放后刷新",
+        			pullUpToLoad: "上拉加载更多",
+        			loading: "加载中..."
+        		},
+        		loadData: function(pageNum){
+        			
+        		},
+        		refreshData: function(){
+        			
+        		}
             },
             prototype: {
                 _create: function(options){
@@ -25,16 +39,144 @@
                 _init: function(){
                     var instance = this,
                         $wrap = this.$wrap,
-                        opts = this.options;
+                        opts = this.options,
+                        offset;
                    
-                    instance.scrollCmp = new IScroll('#'+$wrap.attr("id"), opts);
-                    
+                    var $scroller = $wrap.find(".scroller").eq(0);
+                	var pullDownEl = $("<div class='pullDown'><span class='pullDownIcon'>&nbsp;</span><span class='pullDownLabel'>"
+                			+opts.text.pullDownToRefresh+"</span></div>");
+                	$scroller.prepend(pullDownEl);
+                	var pullDownOffset = pullDownEl[0].offsetHeight;
+                	
+                	var pullUpEl = $("<div class='pullUp'><span class='pullUpIcon'>&nbsp;</span><span class='pullUpLabel'>"
+                			+opts.text.pullUpToLoad+"</span></div>");
+                	$scroller.append(pullUpEl);
+                	var pullUpOffset = pullUpEl[0].offsetHeight;
+
+                	if ($wrap.find(opts.rowSelector).length < opts.itemsPerPage) {
+                		//不满一页
+                		pullDownEl.hide();
+                		pullUpEl.hide();
+                		offset = 0;
+                	} else if (!offset) {
+                		offset = pullUpOffset;
+                	}
+
+                	var myScroll = instance.scrollCmp = new IScroll('.joy-scroll-list', {
+                		probeType : 1,
+                		tap : true,
+                		click : false,
+                		preventDefaultException : {
+                			tagName : /.*/
+                		},
+                		mouseWheel : true,
+                		scrollbars : true,
+                		fadeScrollbars : true,
+                		interactiveScrollbars : false,
+                		keyBindings : false,
+                		deceleration : 0.0002,
+                		startY : (parseInt(offset) * (-1))
+                	});
+                	myScroll.pullUpOffset = pullUpOffset;
+                	
+                	var pullActionDetect = {
+                		count : 0,
+                		limit : 10,
+                		check : function(count) {
+                			if (count) {
+                				pullActionDetect.count = 0;
+                			}
+                			// Detects whether the momentum has stopped, and if it has reached the end - 200px of the scroller - it trigger the pullUpAction
+                			setTimeout(function() {
+                				if (myScroll.y <= (myScroll.maxScrollY + 50)
+                						&& pullUpEl
+                						&& !pullUpEl.hasClass('loading')) {
+                					pullUpEl.addClass('loading');
+                					pullUpEl.find('.pullUpLabel').html(opts.text.loading);
+                					
+                					if ($wrap.data('page')) {
+                						var next_page = parseInt($wrap.data('page'), 10) + 1;
+                					} else {
+                						var next_page = 2;
+                					}
+                					opts.loadData.call(instance, next_page);
+                					$wrap.data('page', next_page);
+                				} else if (pullActionDetect.count < pullActionDetect.limit) {
+                					pullActionDetect.check();
+                					pullActionDetect.count++;
+                				}
+                			}, 200);
+                		}
+                	};
+                	
+                	/*myScroll.on('scrollStart', function() {
+                	});*/
+                	myScroll.on('scroll', function() {
+                		if ($wrap.find(opts.rowSelector).length >= opts.itemsPerPage) {
+                			if (this.y >= 5 && pullDownEl
+                					&& !pullDownEl.hasClass('flip')) {
+                				pullDownEl.addClass('flip');
+                				pullDownEl.find('.pullDownLabel').html(opts.text.releaseToRefresh);
+                				this.minScrollY = 0;
+                			} else if (this.y <= 5 && pullDownEl
+                					&& pullDownEl.hasClass('flip')) {
+                				pullDownEl.removeClass('flip');
+                				pullDownEl.find('.pullDownLabel').html(opts.text.pullDownToRefresh);
+                				this.minScrollY = -pullDownOffset;
+                			}
+                			console.log("y:"+this.y);
+                			pullActionDetect.check(0);
+                		}
+                	});
+                	myScroll.on('scrollEnd', function() {
+                		if ($wrap.find(opts.rowSelector).length >= opts.itemsPerPage) {
+                			if (pullDownEl
+                					&& pullDownEl.hasClass('flip')) {
+                				pullDownEl.removeClass('flip').addClass('loading');
+                				pullDownEl.find('.pullDownLabel').html(opts.text.loading);
+                				
+                				opts.refreshData.call(instance);
+                				$wrap.data('page', 1);
+
+                				// Since "topOffset" is not supported with iscroll-5
+                				$wrap.find('.scroller').css({
+                					top : 0
+                				});
+                			}else{
+                				if(this.y>parseInt(pullUpOffset)*-1)
+                					myScroll.scrollTo(0, parseInt(pullUpOffset) * (-1), 200);
+                			}
+                			// We let the momentum scroll finish, and if reached the end - loading the next page
+                			pullActionDetect.check(0);
+                		}
+                	});
+
+                	/*document.addEventListener('touchmove', function(e) {
+                		e.preventDefault();
+                	}, false);*/
                     $(window.document).on('touchmove', function (e) { e.preventDefault(); });
                 },
 
                 destroy: function(){
+                	this.scrollCmp.destroy();
+                	this.scrollCmp = null;
                     $.removeData(this.$el[0], pluginKey);
-                }
+                },
+                
+                pullActionCallback: function() {
+                	var myScroll = this.scrollCmp;
+            		myScroll.refresh();
+            		var pullDownEl = this.$wrap.find(".pullDown");
+            		var pullUpEl = this.$wrap.find(".pullUp");
+            		if (pullDownEl.hasClass('loading')) {
+            			pullDownEl.removeClass('loading');
+            			pullDownEl.find('.pullDownLabel').html(this.options.text.pullDownToRefresh);
+            			myScroll.scrollTo(0, parseInt(myScroll.pullUpOffset) * (-1), 200);
+            		} else if (pullUpEl.hasClass('loading')) {
+            			pullUpEl.removeClass('loading');
+            			pullUpEl.find('.pullUpLabel').html(this.options.text.pullUpToLoad);
+            		}
+            	}
             }
         });
 
