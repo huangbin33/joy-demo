@@ -14,7 +14,7 @@
         $.extend($.joyscrolllist, {
             defaults: {
             	rowSelector: "ul > li",
-            	itemsPerPage: 10,
+            	itemsPerPage: 20,
             	pullIndicatorClass: '',
             	pullDownAllways: true,
             	text: {
@@ -57,10 +57,13 @@
 
                 	if ($wrap.find(opts.rowSelector).length < opts.itemsPerPage) {
                 		//不满一页
-                		if(!opts.pullDownAllways)
+                		if(!opts.pullDownAllways){
                 			pullDownEl.hide();
+                			offset = 0;
+                		}else if (!offset) {
+                    		offset = pullUpOffset;
+                    	}
                 		pullUpEl.hide();
-                		offset = 0;
                 	} else if (!offset) {
                 		offset = pullUpOffset;
                 	}
