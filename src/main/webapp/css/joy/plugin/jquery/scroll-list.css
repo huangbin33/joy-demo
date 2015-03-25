@@ -40,6 +40,15 @@ body {
 	text-size-adjust: none;
 }
 
+.joy-scroll-indicator{
+	text-align: center;
+	padding: 0 40px;
+}
+
+.joy-scroll-indicator .pullDownLabel, .joy-scroll-indicator .pullUpLabel{
+	margin-right: 40px;
+}
+
 .joy-scroll-list .pullDownLabel, .joy-scroll-list .pullUpLabel {
 	color: #999
 }

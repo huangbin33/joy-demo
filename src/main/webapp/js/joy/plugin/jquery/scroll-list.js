@@ -17,6 +17,7 @@
             	itemsPerPage: 20,
             	pullIndicatorClass: 'joy-scroll-indicator',
             	pullDownAllways: true,
+                triggerOffset: -50,
             	text: {
         			pullDownToRefresh: "下拉刷新",
         			releaseToRefresh: "释放后刷新",
@@ -96,7 +97,8 @@
                 			}
                 			// Detects whether the momentum has stopped, and if it has reached the end - 200px of the scroller - it trigger the pullUpAction
                 			setTimeout(function() {
-                				if (myScroll.y <= (myScroll.maxScrollY - 50)
+                                console.log(myScroll.y+"--"+myScroll.maxScrollY);
+                				if (myScroll.y <= (myScroll.maxScrollY + opts.triggerOffset)
                 						&& !pullUpEl.hasClass('loading') 
                 						&& pullUpEl.is(":visible")) {
                 					pullUpEl.addClass('loading');
@@ -120,7 +122,7 @@
                 	/*myScroll.on('scrollStart', function() {
                 	});*/
                 	myScroll.on('scroll', function() {
-                		//console.log('scroll');
+                		console.log('scroll');
                 		var moreThanOnePage = $wrap.find(opts.rowSelector).length >= opts.itemsPerPage;
                 		if(opts.pullDownAllways || moreThanOnePage){
 	                		if (this.y >= 5 && pullDownEl
@@ -142,7 +144,7 @@
                 		}
                 	});
                 	myScroll.on('scrollEnd', function() {
-                		//console.log('scrollEnd');
+                		console.log('scrollEnd');
                 		var moreThanOnePage = $wrap.find(opts.rowSelector).length >= opts.itemsPerPage;
                 		if(opts.pullDownAllways || moreThanOnePage){
                 			if (pullDownEl.hasClass('flip')) {
@@ -184,7 +186,7 @@
                 },
                 
                 refresh: function(flag, dataLength) {
-                	//console.log('refresh');
+                	console.log('refresh');
                 	var $wrap = this.$wrap,
                 		opts = this.options,
                 		myScroll = this.scrollCmp;
