@@ -15,7 +15,7 @@
             defaults: {
             	rowSelector: "ul > li",
             	itemsPerPage: 20,
-            	pullIndicatorClass: '',
+            	pullIndicatorClass: 'joy-scroll-indicator',
             	pullDownAllways: true,
             	text: {
         			pullDownToRefresh: "下拉刷新",
@@ -96,8 +96,9 @@
                 			}
                 			// Detects whether the momentum has stopped, and if it has reached the end - 200px of the scroller - it trigger the pullUpAction
                 			setTimeout(function() {
-                				if (myScroll.y <= (myScroll.maxScrollY + 50)
-                						&& !pullUpEl.hasClass('loading')) {
+                				if (myScroll.y <= (myScroll.maxScrollY - 50)
+                						&& !pullUpEl.hasClass('loading') 
+                						&& pullUpEl.is(":visible")) {
                 					pullUpEl.addClass('loading');
                 					pullUpEl.find('.pullUpLabel').html(opts.text.loading);
                 					
@@ -119,7 +120,7 @@
                 	/*myScroll.on('scrollStart', function() {
                 	});*/
                 	myScroll.on('scroll', function() {
-                		console.log('scroll');
+                		//console.log('scroll');
                 		var moreThanOnePage = $wrap.find(opts.rowSelector).length >= opts.itemsPerPage;
                 		if(opts.pullDownAllways || moreThanOnePage){
 	                		if (this.y >= 5 && pullDownEl
@@ -141,7 +142,7 @@
                 		}
                 	});
                 	myScroll.on('scrollEnd', function() {
-                		console.log('scrollEnd');
+                		//console.log('scrollEnd');
                 		var moreThanOnePage = $wrap.find(opts.rowSelector).length >= opts.itemsPerPage;
                 		if(opts.pullDownAllways || moreThanOnePage){
                 			if (pullDownEl.hasClass('flip')) {
@@ -182,13 +183,16 @@
                     $.removeData(this.$el[0], pluginKey);
                 },
                 
-                refresh: function(flag) {
-                	console.log('refresh');
+                refresh: function(flag, dataLength) {
+                	//console.log('refresh');
                 	var $wrap = this.$wrap,
                 		opts = this.options,
                 		myScroll = this.scrollCmp;
                 	
             		myScroll.refresh();
+            		if(flag!=2)
+            			$wrap.data('page', 1);
+            		
             		var pullDownEl = $wrap.find(".pullDown");
             		var pullUpEl = $wrap.find(".pullUp");
             		if (flag==1 && pullDownEl.hasClass('loading')) {
@@ -204,6 +208,8 @@
                 		//不满一页
             			if(!opts.pullDownAllways)
                 			pullDownEl.hide();
+                		pullUpEl.hide();
+                	}else if(flag==2 && dataLength===0){
                 		pullUpEl.hide();
                 	}else{
                 		pullDownEl.show();
